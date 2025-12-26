@@ -7,6 +7,7 @@ pipeline {
     }
      environment {
         COURSE = "Jenkins"
+         appVersion = ""
     }
     options {
         timeout(time: 10, unit: 'MINUTES') 
