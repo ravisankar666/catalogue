@@ -7,20 +7,16 @@ pipeline {
     }
      environment {
         COURSE = "Jenkins"
-         appVersion = ""
+        appVersion = ""
+        ACC_ID = "51754230982"
+        PROJECT = "roboshop"
+        COMPONENT = "catalogue"
     }
     options {
         timeout(time: 10, unit: 'MINUTES') 
         disableConcurrentBuilds()
     }
-    //     parameters {                                                                                           /*  #it just like provide the input to pipeline */
-    //     string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-    //     text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
-    //     booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Toggle this value')
-    //     choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-    //     password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
-    // }  
-    // this is build section
+   
     stages {
         stage('Read Version') {
             steps {
@@ -40,12 +36,17 @@ pipeline {
                 }
             }
         }
-        stage('Unit Test') {
+        stage('Build Image') {
             steps {
                 script{
-                    sh """
-                        npm test
-                    """
+                   withAWS(region:'us-east-1',credentials:'aws-creds') {
+                        sh """
+                            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com
+                            docker build -t ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion} .
+                            docker images
+                            docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
+                        """
+                    }
                 }
             }
         }
