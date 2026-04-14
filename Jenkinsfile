@@ -15,7 +15,7 @@ else {
 
 }
 
-#ci pipeline always happens or run in main branch.
+//ci pipeline always happens or run in main branch.
 
 
 
